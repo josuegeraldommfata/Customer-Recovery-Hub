@@ -30,6 +30,42 @@ export function useDashboardMetrics() {
   });
 }
 
+export function useSubscriptionStatus(userId) {
+  return useQuery({
+    queryKey: ["subscriptionStatus", userId],
+    queryFn: async () => {
+      await delay(200);
+      if (!userId) return null;
+      const users = mockDb.getUsers();
+      const user = users.find(u => u.id === userId);
+      if (!user) return null;
+
+      const isExpired = mockDb.isSubscriptionExpired(user);
+      const isTokensExhausted = mockDb.isTokensExhausted(user);
+      const daysRemaining = mockDb.getDaysRemaining(user);
+      const tokensUsed = Number(user.tokens_used) || 0;
+      const tokensLimit = user.tokens_limit === "Ilimitado" || user.tokens_limit === 999999
+        ? "Ilimitado"
+        : Number(user.tokens_limit) || 0;
+      const tokensPercent = tokensLimit === "Ilimitado"
+        ? 0
+        : tokensLimit > 0 ? Math.round((tokensUsed / tokensLimit) * 100) : 0;
+
+      return {
+        ...user,
+        isExpired,
+        isTokensExhausted,
+        daysRemaining,
+        tokensUsed,
+        tokensLimit,
+        tokensPercent,
+      };
+    },
+    enabled: !!userId,
+    refetchInterval: 10000,
+  });
+}
+
 export function useContacts() {
   return useQuery({
     queryKey: ["contacts"],
