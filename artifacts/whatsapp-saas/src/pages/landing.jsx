@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { Bot, CheckCircle2, TrendingUp, Users, MessageSquare, Zap, ChevronDown, ChevronUp } from "lucide-react";
+import { Bot, CheckCircle2, TrendingUp, MessageSquare, Zap, ChevronDown, ChevronUp } from "lucide-react";
 import { motion } from "framer-motion";
 
 const pricingPlans = [
@@ -9,7 +9,7 @@ const pricingPlans = [
     price: "399",
     description: "Por cada Agente de IA",
     features: [
-      "Crie a IA da sua empresa", "Agentes de IA whitelabel", "Treine a IA com seu Prompt", 
+      "Crie a IA da sua empresa", "Agentes de IA whitelabel", "Treine a IA com seu Prompt",
       "Incorpore sua IA no seu site", "Até 1 Agente IA personalizado", "Até 1 Widget: Embed e Web",
       "OpenAI, Anthropic e Gemini", "IA responde no WhatsApp", "Integração com Meta / Z-API",
       "IA responde comentarios no Insta", "IA envia DM no Instagram", "AI Analytics - Dashboard",
@@ -23,7 +23,7 @@ const pricingPlans = [
     popular: true,
     description: "Por cada Agente de IA",
     features: [
-      "Crie a IA da sua empresa", "Agentes de IA whitelabel", "Treine a IA com seu Prompt", 
+      "Crie a IA da sua empresa", "Agentes de IA whitelabel", "Treine a IA com seu Prompt",
       "Incorpore sua IA no seu site", "Até 3 Agentes IA personalizados", "Até 3 Widgets: Embed e Web",
       "OpenAI, Anthropic e Gemini", "IA responde no WhatsApp", "Integração com Meta / Z-API",
       "IA responde comentarios no Insta", "IA envia DM no Instagram", "Integração com Toolzz Chat",
@@ -47,15 +47,15 @@ const pricingPlans = [
   }
 ];
 
-function PricingCard({ plan }: { plan: typeof pricingPlans[0] }) {
+function PricingCard({ plan }) {
   const [expanded, setExpanded] = useState(false);
   const displayFeatures = expanded ? plan.features : plan.features.slice(0, 6);
 
   return (
     <div className={`
       relative p-8 rounded-3xl border flex flex-col h-full
-      ${plan.popular 
-        ? 'bg-card border-emerald-500/50 shadow-[0_0_40px_-10px_rgba(16,185,129,0.3)]' 
+      ${plan.popular
+        ? 'bg-card border-emerald-500/50 shadow-[0_0_40px_-10px_rgba(16,185,129,0.3)]'
         : 'bg-card/50 border-white/10 backdrop-blur-sm'}
     `}>
       {plan.popular && (
@@ -63,10 +63,10 @@ function PricingCard({ plan }: { plan: typeof pricingPlans[0] }) {
           Mais Popular
         </div>
       )}
-      
+
       <h3 className="text-2xl font-display font-bold text-foreground">{plan.name}</h3>
       <p className="text-muted-foreground mt-2 text-sm">{plan.description}</p>
-      
+
       <div className="mt-6 mb-8">
         {plan.price === "Consultivo" ? (
           <div>
@@ -89,8 +89,8 @@ function PricingCard({ plan }: { plan: typeof pricingPlans[0] }) {
       ) : (
         <button className={`
           w-full py-4 rounded-xl font-semibold transition-all mb-8 shadow-lg
-          ${plan.popular 
-            ? 'bg-gradient-to-r from-emerald-500 to-emerald-400 text-white shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:-translate-y-0.5' 
+          ${plan.popular
+            ? 'bg-gradient-to-r from-emerald-500 to-emerald-400 text-white shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:-translate-y-0.5'
             : 'bg-white text-background hover:bg-white/90'}
         `}>
           Teste 15 dias / Assinar
@@ -107,9 +107,9 @@ function PricingCard({ plan }: { plan: typeof pricingPlans[0] }) {
             </li>
           ))}
         </ul>
-        
+
         {plan.features.length > 6 && (
-          <button 
+          <button
             onClick={() => setExpanded(!expanded)}
             className="mt-6 flex items-center gap-2 text-sm text-emerald-400 hover:text-emerald-300 font-medium transition-colors"
           >
@@ -146,13 +146,12 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* Hero Section */}
+      {/* Hero */}
       <section className="relative pt-40 pb-20 overflow-hidden">
-        {/* Absolute generated background image */}
         <div className="absolute inset-0 z-0 opacity-40">
-          <img 
-            src={`${import.meta.env.BASE_URL}images/hero-glow.png`} 
-            alt="Hero Background" 
+          <img
+            src={`${import.meta.env.BASE_URL}images/hero-glow.png`}
+            alt="Hero Background"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-background/60 backdrop-blur-3xl"></div>
@@ -168,15 +167,15 @@ export default function LandingPage() {
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
               A IA que trabalha enquanto você dorme
             </div>
-            
+
             <h1 className="text-5xl md:text-7xl font-display font-bold text-white tracking-tight leading-tight mb-8">
               Recupere clientes perdidos no <span className="text-gradient">WhatsApp</span> automaticamente.
             </h1>
-            
+
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-12">
               Transforme vácuos em vendas. Nossa IA identifica clientes que pararam de responder e envia mensagens persuasivas no momento certo, reativando orçamentos esquecidos.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/login" className="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-400 text-white font-bold text-lg shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:-translate-y-0.5 transition-all">
                 Começar a recuperar agora
@@ -187,8 +186,7 @@ export default function LandingPage() {
             </div>
           </motion.div>
 
-          {/* Social Proof */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.5 }}
@@ -248,7 +246,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing Section */}
+      {/* Pricing */}
       <section className="py-24 relative">
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center mb-16">
@@ -268,7 +266,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer CTA */}
+      {/* Footer */}
       <footer className="py-12 border-t border-white/5 bg-card/20 text-center">
         <div className="flex items-center justify-center gap-2 text-emerald-400 font-display font-bold text-2xl mb-6">
           <Bot size={28} />

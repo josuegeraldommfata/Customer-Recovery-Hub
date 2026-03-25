@@ -55,11 +55,11 @@ export default function AdminHome() {
             <BarChart data={metrics.chartData}>
               <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" tickLine={false} axisLine={false} />
               <YAxis stroke="hsl(var(--muted-foreground))" tickLine={false} axisLine={false} />
-              <Tooltip 
-                cursor={{ fill: 'hsl(var(--white)/0.05)' }}
+              <Tooltip
+                cursor={{ fill: 'rgba(255,255,255,0.03)' }}
                 contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px' }}
               />
-              <Bar dataKey="signups" fill="hsl(var(--accent))" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="signups" fill="#3b82f6" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

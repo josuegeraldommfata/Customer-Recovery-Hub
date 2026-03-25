@@ -6,10 +6,8 @@ import NotFound from "@/pages/not-found";
 
 import { useAuth } from "@/hooks/use-auth";
 
-// Layouts
 import { ClientLayout, AdminLayout } from "@/components/layout";
 
-// Pages
 import LandingPage from "@/pages/landing";
 import LoginPage from "@/pages/login";
 import ClientDashboardHome from "@/pages/dashboard/home";
@@ -23,8 +21,7 @@ import AdminPlans from "@/pages/admin/plans";
 
 const queryClient = new QueryClient();
 
-// Protected Route Wrapper
-function ProtectedRoute({ component: Component, allowedRole, layout: Layout }: any) {
+function ProtectedRoute({ component: Component, allowedRole, layout: Layout }) {
   const { user } = useAuth();
   const [_, setLocation] = useLocation();
 
@@ -48,11 +45,9 @@ function ProtectedRoute({ component: Component, allowedRole, layout: Layout }: a
 function Router() {
   return (
     <Switch>
-      {/* Public */}
       <Route path="/" component={LandingPage} />
       <Route path="/login" component={LoginPage} />
 
-      {/* Client Protected */}
       <Route path="/dashboard">
         {() => <ProtectedRoute component={ClientDashboardHome} allowedRole="cliente" layout={ClientLayout} />}
       </Route>
@@ -66,7 +61,6 @@ function Router() {
         {() => <ProtectedRoute component={ClientHistory} allowedRole="cliente" layout={ClientLayout} />}
       </Route>
 
-      {/* Admin Protected */}
       <Route path="/admin">
         {() => <ProtectedRoute component={AdminHome} allowedRole="admin" layout={AdminLayout} />}
       </Route>
@@ -77,7 +71,6 @@ function Router() {
         {() => <ProtectedRoute component={AdminPlans} allowedRole="admin" layout={AdminLayout} />}
       </Route>
 
-      {/* 404 */}
       <Route component={NotFound} />
     </Switch>
   );

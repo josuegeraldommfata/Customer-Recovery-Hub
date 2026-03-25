@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { mockDb, type User } from "../lib/mock-db";
+import { mockDb } from "../lib/mock-db";
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 export function useAdminMetrics() {
   return useQuery({
@@ -38,12 +38,12 @@ export function useAdminUsers() {
 
 export function useCreateUser() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: async (newUser: Omit<User, "id" | "createdAt">) => {
+    mutationFn: async (newUser) => {
       await delay(600);
       const users = mockDb.getUsers();
-      const user: User = {
+      const user = {
         ...newUser,
         id: Math.random().toString(36).substring(7),
         createdAt: new Date().toISOString()
@@ -59,9 +59,9 @@ export function useCreateUser() {
 
 export function useUpdateUserTokens() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: async ({ userId, tokens }: { userId: string, tokens: number | "Ilimitado" }) => {
+    mutationFn: async ({ userId, tokens }) => {
       await delay(400);
       const users = mockDb.getUsers();
       const updated = users.map(u => u.id === userId ? { ...u, tokens } : u);

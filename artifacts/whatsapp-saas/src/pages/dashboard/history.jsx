@@ -6,7 +6,7 @@ import { CheckCheck, MessageCircle, Ban } from "lucide-react";
 export default function ClientHistory() {
   const { data: history, isLoading } = useHistory();
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status) => {
     switch (status) {
       case "Respondido":
         return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><MessageCircle size={12} /> Respondido</span>;

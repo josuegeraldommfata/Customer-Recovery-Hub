@@ -4,8 +4,8 @@ import { Search, Filter, MessageCircle, Flame, Snowflake, Star } from "lucide-re
 export default function ClientContacts() {
   const { data: contacts, isLoading } = useContacts();
 
-  const getScoreIcon = (score: string) => {
-    switch(score) {
+  const getScoreIcon = (score) => {
+    switch (score) {
       case "Quente": return <Flame size={16} className="text-orange-500" />;
       case "Frio": return <Snowflake size={16} className="text-blue-400" />;
       case "Alto Potencial": return <Star size={16} className="text-yellow-400" />;
@@ -13,8 +13,8 @@ export default function ClientContacts() {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch(status) {
+  const getStatusColor = (status) => {
+    switch (status) {
       case "Respondeu": return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
       case "Não respondeu": return "bg-destructive/10 text-destructive border-destructive/20";
       case "Em andamento": return "bg-yellow-500/10 text-yellow-500 border-yellow-500/20";
@@ -31,13 +31,13 @@ export default function ClientContacts() {
           <h2 className="text-3xl font-display font-bold text-white">Contatos</h2>
           <p className="text-muted-foreground mt-1">Acompanhe o status de recuperação de cada lead.</p>
         </div>
-        
+
         <div className="flex gap-3 w-full sm:w-auto">
           <div className="relative w-full sm:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
-            <input 
-              type="text" 
-              placeholder="Buscar cliente..." 
+            <input
+              type="text"
+              placeholder="Buscar cliente..."
               className="w-full pl-10 pr-4 py-2.5 bg-card border border-border rounded-xl text-white placeholder:text-muted-foreground focus:outline-none focus:border-emerald-500"
             />
           </div>

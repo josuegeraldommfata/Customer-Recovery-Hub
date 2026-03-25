@@ -20,10 +20,10 @@ export default function AdminPlans() {
             <button className="absolute top-6 right-6 text-muted-foreground hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
               <Settings size={20} />
             </button>
-            
+
             <h3 className="text-2xl font-bold text-white mb-1">{plan.name}</h3>
             <div className="text-3xl font-display font-bold text-blue-400 mb-6">{plan.price}</div>
-            
+
             <div className="space-y-4 pt-6 border-t border-border">
               <div className="flex justify-between items-center text-sm">
                 <span className="text-muted-foreground">Assinantes Ativos</span>

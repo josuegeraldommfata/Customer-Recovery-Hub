@@ -9,10 +9,10 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!username || !password) return;
-    
+
     setIsLoading(true);
     await login(username, password);
     setIsLoading(false);
@@ -20,10 +20,9 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col justify-center items-center p-4 relative overflow-hidden">
-      {/* Background decoration */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-emerald-500/20 blur-[120px] rounded-full pointer-events-none" />
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.4 }}

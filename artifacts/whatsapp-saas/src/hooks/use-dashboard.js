@@ -1,8 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { mockDb, type Contact, type HistoryItem } from "../lib/mock-db";
+import { mockDb } from "../lib/mock-db";
 
-// Simulated network delay
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 export function useDashboardMetrics() {
   return useQuery({
@@ -70,7 +69,7 @@ export function useAutomation() {
   });
 
   const toggleMutation = useMutation({
-    mutationFn: async (newStatus: boolean) => {
+    mutationFn: async (newStatus) => {
       await delay(500);
       mockDb.setAutomationStatus(newStatus);
       return newStatus;

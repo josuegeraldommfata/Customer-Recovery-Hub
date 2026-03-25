@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDashboardMetrics } from "@/hooks/use-dashboard";
 import { AreaChart, Area, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
-import { TrendingUp, Users, MessageSquare, AlertCircle, PlayCircle, Flame, ArrowUpRight, DollarSign, Zap } from "lucide-react";
+import { TrendingUp, Users, MessageSquare, AlertCircle, Flame, Zap } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 export default function ClientDashboardHome() {
@@ -9,23 +9,29 @@ export default function ClientDashboardHome() {
   const [showWow, setShowWow] = useState(false);
 
   useEffect(() => {
-    // Simulate real-time WOW notification
     const timer = setTimeout(() => setShowWow(true), 2500);
     const hideTimer = setTimeout(() => setShowWow(false), 8000);
     return () => { clearTimeout(timer); clearTimeout(hideTimer); };
   }, []);
 
   if (isLoading || !metrics) {
-    return <div className="animate-pulse flex flex-col gap-6">
-      <div className="h-40 bg-card rounded-3xl"></div>
-      <div className="grid grid-cols-4 gap-6"><div className="h-32 bg-card rounded-2xl col-span-1" /><div className="h-32 bg-card rounded-2xl col-span-1" /><div className="h-32 bg-card rounded-2xl col-span-1" /><div className="h-32 bg-card rounded-2xl col-span-1" /></div>
-    </div>;
+    return (
+      <div className="animate-pulse flex flex-col gap-6">
+        <div className="h-40 bg-card rounded-3xl"></div>
+        <div className="grid grid-cols-4 gap-6">
+          <div className="h-32 bg-card rounded-2xl col-span-1" />
+          <div className="h-32 bg-card rounded-2xl col-span-1" />
+          <div className="h-32 bg-card rounded-2xl col-span-1" />
+          <div className="h-32 bg-card rounded-2xl col-span-1" />
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="space-y-8 relative">
-      
-      {/* WOW Moment Notification */}
+
+      {/* WOW Notification */}
       <AnimatePresence>
         {showWow && (
           <motion.div
@@ -40,7 +46,7 @@ export default function ClientDashboardHome() {
         )}
       </AnimatePresence>
 
-      {/* Hero Metric */}
+      {/* Hero Revenue Card */}
       <div className="glass-emerald p-8 rounded-3xl relative overflow-hidden">
         <div className="absolute -right-20 -top-20 w-64 h-64 bg-emerald-500/20 blur-[80px] rounded-full"></div>
         <h2 className="text-emerald-400 font-medium text-lg mb-2">Receita Recuperada este mês</h2>
@@ -55,7 +61,7 @@ export default function ClientDashboardHome() {
         </div>
       </div>
 
-      {/* 4 KPI Cards */}
+      {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-card border border-border p-6 rounded-2xl hover:border-white/10 transition-colors">
           <div className="flex justify-between items-start mb-4">
@@ -110,13 +116,13 @@ export default function ClientDashboardHome() {
               <AreaChart data={metrics.chartData}>
                 <defs>
                   <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <XAxis dataKey="day" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
                 <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `R$${val}`} />
-                <RechartsTooltip 
+                <RechartsTooltip
                   contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px' }}
                   itemStyle={{ color: 'hsl(var(--foreground))' }}
                 />
@@ -126,13 +132,13 @@ export default function ClientDashboardHome() {
           </div>
         </div>
 
-        {/* Oportunidades Agora */}
+        {/* Oportunidades */}
         <div className="space-y-4">
           <h3 className="font-display font-bold text-xl text-white flex items-center gap-2">
             <Zap className="text-yellow-500" />
             Oportunidades agora
           </h3>
-          
+
           <div className="bg-yellow-500/10 border border-yellow-500/20 p-5 rounded-2xl flex flex-col gap-4">
             <div className="flex gap-3 text-yellow-500 font-medium">
               <AlertCircle size={20} className="shrink-0" />
@@ -153,7 +159,6 @@ export default function ClientDashboardHome() {
             </button>
           </div>
 
-          {/* Gamification */}
           <div className="bg-card border border-border p-5 rounded-2xl mt-6">
             <div className="text-sm font-medium text-white mb-3 flex justify-between">
               <span>Desempenho Semanal</span>
