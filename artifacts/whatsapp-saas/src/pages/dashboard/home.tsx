@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDashboardMetrics } from "@/hooks/use-dashboard";
 import { AreaChart, Area, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
-import { TrendingUp, Users, MessageSquare, AlertCircle, PlayCircle, Flame, ArrowUpRight, DollarSign } from "lucide-react";
+import { TrendingUp, Users, MessageSquare, AlertCircle, PlayCircle, Flame, ArrowUpRight, DollarSign, Zap } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 export default function ClientDashboardHome() {
