@@ -1,0 +1,18 @@
+packages:
+  "recharts": "Data visualization for revenue and admin charts"
+  "framer-motion": "Smooth animations, page transitions, and micro-interactions"
+  "date-fns": "Date formatting for history and activity feeds"
+  "lucide-react": "Icons (already in base but ensuring availability)"
+
+images:
+  - path: "artifacts/whatsapp-saas/public/images/logo.png"
+    description: "Minimalist, premium tech logo mark for a SaaS company. An abstract 'W' or chat bubble geometric shape in vibrant emerald green and cyan gradient on a transparent background."
+    aspect_ratio: "1:1"
+  - path: "artifacts/whatsapp-saas/public/images/hero-glow.png"
+    description: "Abstract deep dark blue and slate background with a soft, glowing emerald green and teal gradient mesh light leak in the center. Very dark, premium, SaaS aesthetic."
+    aspect_ratio: "16:9"
+
+notes:
+  - "App is purely frontend mock-driven. All data persists in memory or localStorage during the session."
+  - "Auth uses localStorage to simulate JWT/sessions. 'admin/admin123' routes to Admin, 'cliente/cliente123' routes to Dashboard."
+  - "Routing uses wouter. Using exact exact matching for layout boundaries."

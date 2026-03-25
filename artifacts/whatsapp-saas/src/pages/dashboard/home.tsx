@@ -1,0 +1,171 @@
+import { useEffect, useState } from "react";
+import { useDashboardMetrics } from "@/hooks/use-dashboard";
+import { AreaChart, Area, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
+import { TrendingUp, Users, MessageSquare, AlertCircle, PlayCircle, Flame, ArrowUpRight, DollarSign } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+
+export default function ClientDashboardHome() {
+  const { data: metrics, isLoading } = useDashboardMetrics();
+  const [showWow, setShowWow] = useState(false);
+
+  useEffect(() => {
+    // Simulate real-time WOW notification
+    const timer = setTimeout(() => setShowWow(true), 2500);
+    const hideTimer = setTimeout(() => setShowWow(false), 8000);
+    return () => { clearTimeout(timer); clearTimeout(hideTimer); };
+  }, []);
+
+  if (isLoading || !metrics) {
+    return <div className="animate-pulse flex flex-col gap-6">
+      <div className="h-40 bg-card rounded-3xl"></div>
+      <div className="grid grid-cols-4 gap-6"><div className="h-32 bg-card rounded-2xl col-span-1" /><div className="h-32 bg-card rounded-2xl col-span-1" /><div className="h-32 bg-card rounded-2xl col-span-1" /><div className="h-32 bg-card rounded-2xl col-span-1" /></div>
+    </div>;
+  }
+
+  return (
+    <div className="space-y-8 relative">
+      
+      {/* WOW Moment Notification */}
+      <AnimatePresence>
+        {showWow && (
+          <motion.div
+            initial={{ opacity: 0, y: -50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.9 }}
+            className="fixed top-24 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-full glass-emerald text-emerald-400 font-bold flex items-center gap-3 shadow-2xl"
+          >
+            <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center">💰</div>
+            + R$ 450,00 recuperados agora! (Maria Oliveira comprou)
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Hero Metric */}
+      <div className="glass-emerald p-8 rounded-3xl relative overflow-hidden">
+        <div className="absolute -right-20 -top-20 w-64 h-64 bg-emerald-500/20 blur-[80px] rounded-full"></div>
+        <h2 className="text-emerald-400 font-medium text-lg mb-2">Receita Recuperada este mês</h2>
+        <div className="flex items-end gap-4">
+          <span className="text-6xl font-display font-bold text-white">
+            R$ {metrics.revenueRecovered.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </span>
+          <div className="flex items-center gap-1 text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-xl font-medium mb-2">
+            <TrendingUp size={18} />
+            +{metrics.revenueGrowth}%
+          </div>
+        </div>
+      </div>
+
+      {/* 4 KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-card border border-border p-6 rounded-2xl hover:border-white/10 transition-colors">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-3 bg-blue-500/10 rounded-xl"><Users className="text-blue-400" size={24} /></div>
+          </div>
+          <div className="text-muted-foreground text-sm font-medium mb-1">Clientes Reativados</div>
+          <div className="text-3xl font-display font-bold text-white flex items-baseline gap-2">
+            {metrics.reactivatedClients}
+            <span className="text-sm font-medium text-emerald-400">+{metrics.reactivatedGrowth}%</span>
+          </div>
+        </div>
+
+        <div className="bg-card border border-border p-6 rounded-2xl hover:border-white/10 transition-colors">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-3 bg-purple-500/10 rounded-xl"><MessageSquare className="text-purple-400" size={24} /></div>
+          </div>
+          <div className="text-muted-foreground text-sm font-medium mb-1">Tentativas de Recuperação</div>
+          <div className="text-3xl font-display font-bold text-white">{metrics.recoveryAttempts}</div>
+        </div>
+
+        <div className="bg-card border border-border p-6 rounded-2xl hover:border-white/10 transition-colors">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-3 bg-emerald-500/10 rounded-xl"><TrendingUp className="text-emerald-400" size={24} /></div>
+          </div>
+          <div className="text-muted-foreground text-sm font-medium mb-1">Taxa de Recuperação</div>
+          <div className="text-3xl font-display font-bold text-white">{metrics.recoveryRate}%</div>
+        </div>
+
+        <div className="bg-destructive/10 border border-destructive/20 p-6 rounded-2xl">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-3 bg-destructive/20 rounded-xl"><AlertCircle className="text-destructive" size={24} /></div>
+          </div>
+          <div className="text-destructive font-medium text-sm mb-1">Vendas que seriam perdidas</div>
+          <div className="text-3xl font-display font-bold text-white">
+            R$ {metrics.lostPotential.toLocaleString('pt-BR')}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Chart */}
+        <div className="lg:col-span-2 bg-card border border-border p-6 rounded-3xl">
+          <div className="flex items-center justify-between mb-8">
+            <h3 className="font-display font-bold text-xl text-white">Evolução Diária de Recuperação</h3>
+            <select className="bg-background border border-border rounded-lg px-3 py-1.5 text-sm text-muted-foreground outline-none">
+              <option>Últimos 7 dias</option>
+              <option>Este mês</option>
+            </select>
+          </div>
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={metrics.chartData}>
+                <defs>
+                  <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <XAxis dataKey="day" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `R$${val}`} />
+                <RechartsTooltip 
+                  contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px' }}
+                  itemStyle={{ color: 'hsl(var(--foreground))' }}
+                />
+                <Area type="monotone" dataKey="value" stroke="hsl(var(--primary))" strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Oportunidades Agora */}
+        <div className="space-y-4">
+          <h3 className="font-display font-bold text-xl text-white flex items-center gap-2">
+            <Zap className="text-yellow-500" />
+            Oportunidades agora
+          </h3>
+          
+          <div className="bg-yellow-500/10 border border-yellow-500/20 p-5 rounded-2xl flex flex-col gap-4">
+            <div className="flex gap-3 text-yellow-500 font-medium">
+              <AlertCircle size={20} className="shrink-0" />
+              <span>12 clientes não respondem há mais de 2h</span>
+            </div>
+            <button className="w-full py-2.5 bg-yellow-500 text-black font-bold rounded-xl hover:bg-yellow-400 transition-colors">
+              Recuperar agora
+            </button>
+          </div>
+
+          <div className="bg-red-500/10 border border-red-500/20 p-5 rounded-2xl flex flex-col gap-4">
+            <div className="flex gap-3 text-red-400 font-medium">
+              <Flame size={20} className="shrink-0" />
+              <span>5 clientes QUENTES sumiram no orçamento</span>
+            </div>
+            <button className="w-full py-2.5 bg-red-500/20 text-red-400 border border-red-500/30 font-bold rounded-xl hover:bg-red-500/30 transition-colors">
+              Ver conversas
+            </button>
+          </div>
+
+          {/* Gamification */}
+          <div className="bg-card border border-border p-5 rounded-2xl mt-6">
+            <div className="text-sm font-medium text-white mb-3 flex justify-between">
+              <span>Desempenho Semanal</span>
+              <span className="text-emerald-400">Top 22%</span>
+            </div>
+            <div className="w-full bg-background rounded-full h-2 mb-2 overflow-hidden">
+              <div className="bg-gradient-to-r from-emerald-500 to-cyan-400 h-2 rounded-full" style={{ width: '78%' }}></div>
+            </div>
+            <p className="text-xs text-muted-foreground">Você recuperou mais que 78% dos usuários essa semana. Continue assim! 🚀</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
