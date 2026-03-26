@@ -10,6 +10,7 @@ import SubscriptionGuard from "@/components/subscription-guard";
 
 import LandingPage from "@/pages/landing";
 import LoginPage from "@/pages/login";
+import CadastroPage from "@/pages/cadastro";
 
 import ClientDashboardHome from "@/pages/dashboard/home";
 import ClientContacts from "@/pages/dashboard/contacts";
@@ -56,6 +57,7 @@ function Router() {
     <Switch>
       <Route path="/" component={LandingPage} />
       <Route path="/login" component={LoginPage} />
+      <Route path="/cadastro" component={CadastroPage} />
 
       {/* Client routes */}
       <Route path="/dashboard">

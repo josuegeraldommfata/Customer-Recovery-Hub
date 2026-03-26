@@ -59,10 +59,11 @@ export function useSubscriptionStatus(userId) {
         tokensUsed,
         tokensLimit,
         tokensPercent,
+        isTrial: user.plan === "Trial",
       };
     },
     enabled: !!userId,
-    refetchInterval: 10000,
+    refetchInterval: 5000,
   });
 }
 
@@ -86,6 +87,73 @@ export function useHistory() {
   });
 }
 
+export function useSendMessage() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ contactId, contactName, message, userId, valueRecovered }) => {
+      await delay(1200);
+      // Consome 1 token
+      const ok = mockDb.consumeToken(userId, 1);
+      if (!ok) throw new Error("Tokens esgotados");
+
+      // Atualiza status do contato
+      const contacts = mockDb.getContacts();
+      const updated = contacts.map(c =>
+        c.id === contactId ? { ...c, status: "Em andamento", lastInteraction: "Agora mesmo" } : c
+      );
+      mockDb.setContacts(updated);
+
+      // Adiciona ao histórico
+      mockDb.addHistory({
+        id: "h_" + Date.now(),
+        contactName,
+        message,
+        status: "Entregue",
+        timestamp: new Date().toISOString(),
+        valueRecovered: valueRecovered || null,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["contacts"] });
+      queryClient.invalidateQueries({ queryKey: ["history"] });
+      queryClient.invalidateQueries({ queryKey: ["subscriptionStatus"] });
+    }
+  });
+}
+
+export function useSendBulkRecovery() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ contacts, message, userId }) => {
+      await delay(2000);
+      for (const contact of contacts) {
+        const ok = mockDb.consumeToken(userId, 1);
+        if (!ok) break;
+        const allContacts = mockDb.getContacts();
+        const updated = allContacts.map(c =>
+          c.id === contact.id ? { ...c, status: "Em andamento", lastInteraction: "Agora mesmo" } : c
+        );
+        mockDb.setContacts(updated);
+        mockDb.addHistory({
+          id: "h_" + Date.now() + "_" + contact.id,
+          contactName: contact.name,
+          message: message.replace("{nome}", contact.name.split(" ")[0]),
+          status: "Entregue",
+          timestamp: new Date().toISOString(),
+        });
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["contacts"] });
+      queryClient.invalidateQueries({ queryKey: ["history"] });
+      queryClient.invalidateQueries({ queryKey: ["subscriptionStatus"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboardMetrics"] });
+    }
+  });
+}
+
 export function useAutomation() {
   const queryClient = useQueryClient();
 
@@ -93,10 +161,11 @@ export function useAutomation() {
     queryKey: ["automation"],
     queryFn: async () => {
       await delay(200);
+      const config = mockDb.getAutomationConfig();
       return {
         isActive: mockDb.getAutomationStatus(),
-        triggerTime: "1h",
-        message: "Oi {nome}, vi que você deixou alguns itens no carrinho. Aconteceu algum problema? Posso te ajudar a finalizar com 10% de desconto hoje? 😊",
+        triggerTime: config.triggerTime || "1h",
+        message: config.message || "Oi {nome}, seu carrinho ainda está esperando por você!",
         estimatedImpact: 18,
         messagesSentThisWeek: 342,
         responseRate: 42
@@ -110,10 +179,24 @@ export function useAutomation() {
       mockDb.setAutomationStatus(newStatus);
       return newStatus;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["automation"] });
-    }
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["automation"] }),
   });
 
-  return { ...query, toggleAutomation: toggleMutation.mutate, isToggling: toggleMutation.isPending };
+  const saveMutation = useMutation({
+    mutationFn: async ({ triggerTime, message }) => {
+      await delay(600);
+      const current = mockDb.getAutomationConfig();
+      mockDb.setAutomationConfig({ ...current, triggerTime, message });
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["automation"] }),
+  });
+
+  return {
+    ...query,
+    toggleAutomation: toggleMutation.mutate,
+    isToggling: toggleMutation.isPending,
+    saveConfig: saveMutation.mutate,
+    isSaving: saveMutation.isPending,
+    saveSuccess: saveMutation.isSuccess,
+  };
 }

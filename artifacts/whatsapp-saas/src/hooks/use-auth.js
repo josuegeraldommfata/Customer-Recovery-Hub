@@ -14,32 +14,37 @@ export function useAuth() {
 
   const login = async (username, password) => {
     await new Promise(resolve => setTimeout(resolve, 800));
-
     const users = mockDb.getUsers();
     const foundUser = users.find(u => u.username === username);
 
     if (foundUser && password === `${username}123`) {
       setUser(foundUser);
       localStorage.setItem("current_user", JSON.stringify(foundUser));
-
-      toast({
-        title: "Login realizado com sucesso",
-        description: `Bem-vindo de volta, ${foundUser.name}!`,
-      });
-
-      if (foundUser.role === "admin") {
-        setLocation("/admin");
-      } else {
-        setLocation("/dashboard");
-      }
-      return true;
+      toast({ title: "Login realizado!", description: `Bem-vindo de volta, ${foundUser.name}!` });
+      if (foundUser.role === "admin") setLocation("/admin");
+      else setLocation("/dashboard");
+      return { ok: true };
     } else {
+      toast({ variant: "destructive", title: "Credenciais inválidas", description: "Verifique usuário e senha." });
+      return { ok: false };
+    }
+  };
+
+  const register = async ({ name, email, username }) => {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      const newUser = mockDb.createTrialUser({ name, email, username });
+      setUser(newUser);
+      localStorage.setItem("current_user", JSON.stringify(newUser));
       toast({
-        variant: "destructive",
-        title: "Credenciais inválidas",
-        description: "Verifique seu usuário e senha e tente novamente.",
+        title: "Conta criada! 🎉",
+        description: `Seu trial de 5 dias com 60 tokens gratuitos começa agora, ${newUser.name}!`,
       });
-      return false;
+      setLocation("/dashboard");
+      return { ok: true };
+    } catch (err) {
+      toast({ variant: "destructive", title: "Erro ao criar conta", description: err.message });
+      return { ok: false, error: err.message };
     }
   };
 
@@ -49,5 +54,5 @@ export function useAuth() {
     setLocation("/login");
   };
 
-  return { user, login, logout, isAuthenticated: !!user };
+  return { user, login, register, logout, isAuthenticated: !!user };
 }

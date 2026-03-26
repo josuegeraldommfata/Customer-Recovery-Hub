@@ -1,10 +1,11 @@
-// Central mock data store — v2 (com expiração, tokens_used, configurações MP)
-const DB_VERSION = "v2";
+// Central mock data store — v3 (trial, botões funcionais)
+const DB_VERSION = "v3";
 
-const PLAN_PRICES = { Mini: 399, Starter: 990, Enterprise: 3900 };
-const PLAN_TOKEN_LIMITS = { Mini: 5000, Starter: 15000, Enterprise: "Ilimitado", Nenhum: 0 };
+const PLAN_PRICES = { Mini: 399, Starter: 990, Enterprise: 3900, Trial: 0 };
+const PLAN_TOKEN_LIMITS = { Mini: 5000, Starter: 15000, Enterprise: 999999, Trial: 60, Nenhum: 0 };
 
-// Hoje = 2026-03-25
+const TODAY = "2026-03-26";
+
 const initialUsers = [
   {
     id: "1", username: "admin", name: "Administrador", role: "admin",
@@ -36,6 +37,12 @@ const initialUsers = [
     tokens_limit: 100, status: "Pendente", createdAt: "2026-03-20T16:45:00Z",
     expires_at: "2026-04-15T23:59:59Z", whatsapp_connected: false
   },
+  {
+    id: "6", username: "trial", name: "Usuário Trial", role: "cliente",
+    email: "trial@teste.com", plan: "Trial", tokens: 60, tokens_used: 5,
+    tokens_limit: 60, status: "Ativo", createdAt: "2026-03-24T12:00:00Z",
+    expires_at: "2026-03-29T23:59:59Z", whatsapp_connected: false
+  },
 ];
 
 const initialContacts = [
@@ -60,7 +67,11 @@ const initialAdminSettings = {
   notification_email: "admin@recoverIA.com",
 };
 
-// Reset se versão mudou
+const initialAutomationConfig = {
+  triggerTime: "1h",
+  message: "Oi {nome}, vi que você deixou alguns itens no carrinho. Aconteceu algum problema? Posso te ajudar a finalizar com 10% de desconto hoje? 😊",
+};
+
 if (localStorage.getItem("mock_db_version") !== DB_VERSION) {
   localStorage.clear();
   localStorage.setItem("mock_db_version", DB_VERSION);
@@ -71,6 +82,7 @@ if (!localStorage.getItem("mock_contacts")) localStorage.setItem("mock_contacts"
 if (!localStorage.getItem("mock_history")) localStorage.setItem("mock_history", JSON.stringify(initialHistory));
 if (!localStorage.getItem("mock_automation_status")) localStorage.setItem("mock_automation_status", JSON.stringify(true));
 if (!localStorage.getItem("mock_admin_settings")) localStorage.setItem("mock_admin_settings", JSON.stringify(initialAdminSettings));
+if (!localStorage.getItem("mock_automation_config")) localStorage.setItem("mock_automation_config", JSON.stringify(initialAutomationConfig));
 
 export { PLAN_PRICES, PLAN_TOKEN_LIMITS };
 
@@ -87,7 +99,6 @@ export const mockDb = {
     const users = JSON.parse(localStorage.getItem("mock_users") || "[]");
     const updated = users.map(u => u.id === id ? { ...u, ...patch } : u);
     localStorage.setItem("mock_users", JSON.stringify(updated));
-    // Atualiza current_user se for o mesmo
     const current = localStorage.getItem("current_user");
     if (current) {
       const cu = JSON.parse(current);
@@ -95,18 +106,74 @@ export const mockDb = {
     }
   },
 
+  // Cria usuário trial (5 dias, 60 tokens)
+  createTrialUser: (data) => {
+    const users = JSON.parse(localStorage.getItem("mock_users") || "[]");
+    if (users.find(u => u.username === data.username || u.email === data.email)) {
+      throw new Error("Usuário ou e-mail já cadastrado.");
+    }
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 5);
+    const user = {
+      id: "u_" + Math.random().toString(36).substring(2, 9),
+      username: data.username,
+      name: data.name,
+      email: data.email,
+      role: "cliente",
+      plan: "Trial",
+      tokens: 60,
+      tokens_used: 0,
+      tokens_limit: 60,
+      status: "Ativo",
+      createdAt: new Date().toISOString(),
+      expires_at: expiresAt.toISOString(),
+      whatsapp_connected: false,
+    };
+    localStorage.setItem("mock_users", JSON.stringify([...users, user]));
+    return user;
+  },
+
+  // Consume tokens do usuário e retorna ok/bloqueado
+  consumeToken: (userId, amount = 1) => {
+    const users = JSON.parse(localStorage.getItem("mock_users") || "[]");
+    const user = users.find(u => u.id === userId);
+    if (!user) return false;
+    if (user.tokens_limit !== "Ilimitado" && user.tokens_limit !== 999999) {
+      if (user.tokens_used >= user.tokens_limit) return false;
+    }
+    const updated = users.map(u => u.id === userId
+      ? { ...u, tokens_used: (u.tokens_used || 0) + amount }
+      : u
+    );
+    localStorage.setItem("mock_users", JSON.stringify(updated));
+    const current = localStorage.getItem("current_user");
+    if (current) {
+      const cu = JSON.parse(current);
+      if (cu.id === userId) {
+        localStorage.setItem("current_user", JSON.stringify({ ...cu, tokens_used: (cu.tokens_used || 0) + amount }));
+      }
+    }
+    return true;
+  },
+
   getContacts: () => JSON.parse(localStorage.getItem("mock_contacts") || "[]"),
   setContacts: (contacts) => localStorage.setItem("mock_contacts", JSON.stringify(contacts)),
 
   getHistory: () => JSON.parse(localStorage.getItem("mock_history") || "[]"),
+  addHistory: (entry) => {
+    const history = JSON.parse(localStorage.getItem("mock_history") || "[]");
+    localStorage.setItem("mock_history", JSON.stringify([entry, ...history]));
+  },
 
   getAutomationStatus: () => JSON.parse(localStorage.getItem("mock_automation_status") || "true"),
   setAutomationStatus: (status) => localStorage.setItem("mock_automation_status", JSON.stringify(status)),
 
+  getAutomationConfig: () => JSON.parse(localStorage.getItem("mock_automation_config") || "{}"),
+  setAutomationConfig: (config) => localStorage.setItem("mock_automation_config", JSON.stringify(config)),
+
   getAdminSettings: () => JSON.parse(localStorage.getItem("mock_admin_settings") || "{}"),
   setAdminSettings: (settings) => localStorage.setItem("mock_admin_settings", JSON.stringify(settings)),
 
-  // Helpers de assinatura
   isSubscriptionExpired: (user) => {
     if (!user || user.role === "admin") return false;
     if (!user.expires_at) return false;
@@ -138,5 +205,12 @@ export const mockDb = {
       : u
     );
     localStorage.setItem("mock_users", JSON.stringify(updated));
+    const current = localStorage.getItem("current_user");
+    if (current) {
+      const cu = JSON.parse(current);
+      if (cu.id === userId) {
+        localStorage.setItem("current_user", JSON.stringify({ ...cu, expires_at: base.toISOString(), status: "Ativo" }));
+      }
+    }
   },
 };
